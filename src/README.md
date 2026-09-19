@@ -1,4 +1,4 @@
-<!-- ai-generated: 0% - written by the course team -->
+<!-- ai-generated: 100% - generated with AI and reviewed by the student -->
 # src/
 
 Your implementation lives here, in any language. `Dockerfile.example` copies this directory into the image and
