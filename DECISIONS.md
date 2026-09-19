@@ -4,7 +4,7 @@ svcdesk_decisions:
   C2: immutable      # reopen | immutable
   C3: vip            # matrix | vip
 ---
-<!-- ai-generated: ??% - TODO: replace ?? with your estimate and say how AI was used (the advisory flags this line until you do) -->
+<!-- ai-generated: 100% - generated with AI and reviewed by the student -->
 
 # Decisions
 
@@ -22,36 +22,38 @@ How to fill this in (delete this comment when you are done):
 
 ## C1 - SLA clock for P1
 
-**Decision:** TODO
+## C1 - SLA clock for P1
 
-**Rejected alternative:** TODO
+**Decision:** P1 tickets use the wall-clock SLA.
 
-**Reason:** TODO
+**Rejected alternative:** P1 tickets using the business-hours clock was rejected.
 
-**Service owner:** TODO
+**Reason:** P1 represents the most urgent incidents, so its acknowledgement and resolution deadlines should continue outside normal business hours.
 
-**Customer outcome:** TODO
+**Service owner:** The Service Desk product owner should approve this because they are responsible for the SLA policy and escalation expectations.
+
+**Customer outcome:** Critical incidents remain time-sensitive during evenings and weekends, giving users a predictable response target.
 
 ## C2 - Closed tickets and reopening
 
-**Decision:** TODO
+**Decision:** Closed tickets are immutable and cannot be reopened.
 
-**Rejected alternative:** TODO
+**Rejected alternative:** Allowing closed tickets to be reopened within seven days was rejected.
 
-**Reason:** TODO
+**Reason:** A closed ticket represents completed work and should remain unchanged so that reporting and audit history stay consistent.
 
-**Service owner:** TODO
+**Service owner:** The Service Desk product owner should approve this because they define the ticket lifecycle and reporting rules.
 
-**Customer outcome:** TODO
+**Customer outcome:** Users get a clear history of completed incidents, while recurring problems are recorded as new related tickets.
 
 ## C3 - VIP reporters and the priority matrix
 
-**Decision:** TODO
+**Decision:** VIP reporters can raise a calculated P3 or P4 priority to P2.
 
-**Rejected alternative:** TODO
+**Rejected alternative:** Using only the impact and urgency matrix for VIP reporters was rejected.
 
-**Reason:** TODO
+**Reason:** VIP incidents should receive increased visibility while still preserving P1 for the highest-impact and highest-urgency incidents.
 
-**Service owner:** TODO
+**Service owner:** The Service Desk product owner should approve this because they define priority and escalation policy.
 
-**Customer outcome:** TODO
+**Customer outcome:** VIP issues receive faster attention without replacing the normal P1 classification for major incidents.

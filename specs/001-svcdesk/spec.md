@@ -1,4 +1,4 @@
-<!-- ai-generated: 50% - AI helped structure and phrase parts of the specification; the student reviewed and revised the content -->
+<!-- ai-generated: 100% - generated with AI from the course requirements and reviewed by the student -->
 
 # svcdesk specification
 
