@@ -18,5 +18,17 @@ services:
       timeout: 2s
       retries: 60
 
+  tests:
+    profiles:
+      - tests
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    environment:
+      SVCDESK_URL: "http://svcdesk:8080"
+    depends_on:
+      svcdesk:
+        condition: service_healthy
+
 volumes:
   svcdesk-data:
