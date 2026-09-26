@@ -491,3 +491,67 @@ def ticket_sla(ticket_id: str, request: Request):
         "resolve_breached": resolve_breached,
         "paused": paused,
     }
+from src.dora_metrics import MetricInputError, compute_metrics
+
+
+@app.post("/dora/metrics")
+async def dora_metrics(request: Request):
+    try:
+        body = await request.json()
+    except Exception:
+        return error_response(
+            400,
+            "invalid_json",
+            "invalid JSON body",
+        )
+
+    try:
+        return compute_metrics(body)
+    except MetricInputError as exc:
+        return error_response(
+            422,
+            "validation",
+            str(exc),
+        )
+
+
+@app.get("/dora/ticket-events")
+def dora_ticket_events():
+    events = []
+
+    phase_fields = [
+        ("created", "created_at", "new"),
+        (
+            "acknowledged",
+            "acknowledged_at",
+            "acknowledged",
+        ),
+        ("resolved", "resolved_at", "resolved"),
+        ("closed", "closed_at", "closed"),
+    ]
+
+    for ticket in load_all_tickets():
+        for phase, field, state in phase_fields:
+            at = ticket.get(field)
+
+            if at is None:
+                continue
+
+            events.append(
+                {
+                    "ticket_id": ticket["id"],
+                    "at": at,
+                    "phase": phase,
+                    "priority": ticket["priority"],
+                    "state": state,
+                }
+            )
+
+    events.sort(
+        key=lambda item: (
+            parse_instant(item["at"]),
+            item["ticket_id"],
+        )
+    )
+
+    return events
