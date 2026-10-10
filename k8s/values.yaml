@@ -1,0 +1,9 @@
+# ai-generated: 70% - based on the course kube-prometheus-stack template; I reviewed the retention and memory cap
+prometheus:
+  prometheusSpec:
+    retention: 2h
+    resources:
+      limits:
+        memory: 1Gi
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false

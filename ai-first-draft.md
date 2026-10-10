@@ -3,11 +3,11 @@ lab3_first_draft:
   source: ai
   tool: "ChatGPT (GPT-5.6 Sol), ChatGPT chat, 2026-10-10"
   ladder: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0]
-  verdict: TODO
-  evidence: {p99_seconds: TODO, bucket: [TODO, TODO], relative_width: TODO}
+  verdict: refuted
+  evidence: {p99_seconds: 0.1688, bucket: [0.1, 0.25], relative_width: 0.8886}
 lab3_flawed_ladder:
   verdict: refuted
-  evidence: {p99_seconds: TODO, bucket: [TODO, TODO], relative_width: TODO}
+  evidence: {p99_seconds: 0.1688, bucket: [0.04, 0.5], relative_width: 2.7251}
 ---
 <!-- ai-generated: 80% - AI supplied the first draft and helped structure the file; I review the evidence and verdicts -->
 
@@ -67,12 +67,12 @@ The alert uses a five-minute rate window to calculate the recent latency distrib
 
 ## Verdict on the draft ladder
 
-TODO - fill after the first load 3 measurement.
+Refuted. The measured p99 was 0.1688 s. In the assistant's draft ladder this falls in the bucket (0.1, 0.25], whose width is 0.15 s. The relative width is 0.15 / 0.1688 = 0.8886, or about 88.86% of p99, which is far too coarse to resolve the measured p99 accurately. A histogram_quantile estimate from this bucket could place p99 anywhere across a very wide 100-250 ms interval.
 
 ## The draft alert rule
 
-TODO - evaluate after the SLO and measured latency distribution are known.
+The draft alert used a fixed p99 threshold of 0.5 s for 10 minutes. I would not keep it as the final SLO alert because it is a single latency threshold rather than a multiwindow burn-rate alert tied to the error budget. The useful part I keep is filtering the latency metric to the /kb/search route and using the histogram to reason about user-visible latency.
 
 ## Verdict on the instructor's flawed ladder
 
-TODO - fill after the first load 3 measurement.
+Refuted. The measured p99 was 0.1688 s. In the instructor's flawed ladder this falls in the bucket (0.04, 0.5], whose width is 0.46 s. The relative width is 0.46 / 0.1688 = 2.7251, or about 272.51% of p99. That bucket is much too wide, so histogram_quantile cannot estimate this p99 with useful resolution.

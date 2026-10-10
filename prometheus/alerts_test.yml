@@ -1,0 +1,47 @@
+﻿# ai-generated: 90% - AI drafted mutation-sensitive promtool tests; I reviewed the burn rates and expected firing edges
+
+rule_files:
+  - alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{job="svcdesk", instance="svcdesk:8080", http_request_method="GET", http_route="/kb/search", http_response_status_code="200"}'
+        values: '0+1000x70 70712+712x60'
+      - series: 'http_server_request_duration_seconds_count{job="svcdesk", instance="svcdesk:8080", http_request_method="GET", http_route="/kb/search", http_response_status_code="502"}'
+        values: '0x70 288+288x60'
+    alert_rule_test:
+      - eval_time: 104m
+        alertname: KbSearchAvailabilityBurnFast
+        exp_alerts: []
+      - eval_time: 105m
+        alertname: KbSearchAvailabilityBurnFast
+        exp_alerts:
+          - exp_labels:
+              service: svcdesk
+              slo: availability
+              severity: P1
+            exp_annotations:
+              summary: "Fast availability error-budget burn on GET /kb/search"
+
+  - interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{job="svcdesk", instance="svcdesk:8080", http_request_method="GET", http_route="/kb/search", http_response_status_code="200"}'
+        values: '0+1000x370 370880+880x220'
+      - series: 'http_server_request_duration_seconds_count{job="svcdesk", instance="svcdesk:8080", http_request_method="GET", http_route="/kb/search", http_response_status_code="502"}'
+        values: '0x370 120+120x220'
+    alert_rule_test:
+      - eval_time: 554m
+        alertname: KbSearchAvailabilityBurnSlow
+        exp_alerts: []
+      - eval_time: 555m
+        alertname: KbSearchAvailabilityBurnSlow
+        exp_alerts:
+          - exp_labels:
+              service: svcdesk
+              slo: availability
+              severity: P2
+            exp_annotations:
+              summary: "Sustained availability error-budget burn on GET /kb/search"

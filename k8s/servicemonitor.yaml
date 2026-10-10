@@ -1,0 +1,13 @@
+# ai-generated: 75% - AI drafted the ServiceMonitor from the Lab 3 requirement; I reviewed the svcdesk selector and metrics path
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: svcdesk
+spec:
+  selector:
+    matchLabels:
+      app: svcdesk
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

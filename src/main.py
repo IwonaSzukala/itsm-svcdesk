@@ -1,4 +1,4 @@
-# ai-generated: 100% - generated with AI from the course API contract and reviewed by the student
+﻿# ai-generated: 100% - generated with AI from the course API contract and reviewed by the student
 
 import json
 import os
@@ -555,3 +555,138 @@ def dora_ticket_events():
     )
 
     return events
+
+# Lab 3 monitoring
+import time as _time
+import urllib.error as _urllib_error
+import urllib.parse as _urllib_parse
+import urllib.request as _urllib_request
+
+from fastapi import Query as _Query
+from fastapi.responses import Response as _Response
+from prometheus_client import (
+    CONTENT_TYPE_LATEST as _PROM_CONTENT_TYPE,
+    Histogram as _Histogram,
+    disable_created_metrics as _disable_created_metrics,
+    generate_latest as _generate_latest,
+)
+
+_disable_created_metrics()
+
+_HTTP_DURATION = _Histogram(
+    "http_server_request_duration_seconds",
+    "HTTP server request duration in seconds",
+    [
+        "http_request_method",
+        "http_route",
+        "http_response_status_code",
+    ],
+    buckets=(
+        0.005,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.075,
+        0.1,
+        0.12,
+        0.14,
+        0.15,
+        0.16,
+        0.17,
+        0.18,
+        0.19,
+        0.2,
+        0.22,
+        0.25,
+        0.3,
+        0.5,
+        1.0,
+        2.5,
+        5.0,
+    ),
+)
+
+
+@app.middleware("http")
+async def observe_http_requests(request: Request, call_next):
+    if request.url.path == "/metrics":
+        return await call_next(request)
+
+    started = _time.perf_counter()
+    status_code = "500"
+
+    try:
+        response = await call_next(request)
+        status_code = str(response.status_code)
+        return response
+    finally:
+        elapsed = _time.perf_counter() - started
+
+        route = request.scope.get("route")
+        route_template = getattr(route, "path", None)
+
+        if not route_template:
+            route_template = "unmatched"
+
+        _HTTP_DURATION.labels(
+            http_request_method=request.method,
+            http_route=route_template,
+            http_response_status_code=status_code,
+        ).observe(elapsed)
+
+
+@app.get("/metrics")
+def prometheus_metrics():
+    return _Response(
+        content=_generate_latest(),
+        headers={"Content-Type": _PROM_CONTENT_TYPE},
+    )
+
+
+@app.get("/kb/search")
+def kb_search(
+    q: str = _Query(..., min_length=1, max_length=200),
+):
+    base_url = os.getenv(
+        "KB_INDEX_URL",
+        "http://kb-index:8080",
+    ).rstrip("/")
+
+    query_string = _urllib_parse.urlencode({"q": q})
+    upstream_url = f"{base_url}/search?{query_string}"
+
+    try:
+        with _urllib_request.urlopen(
+            upstream_url,
+            timeout=3.0,
+        ) as upstream:
+            if upstream.status != 200:
+                return error_response(
+                    502,
+                    "upstream_unavailable",
+                    "knowledge-base index unavailable",
+                )
+
+            payload = json.loads(
+                upstream.read().decode("utf-8")
+            )
+
+    except (
+        _urllib_error.HTTPError,
+        _urllib_error.URLError,
+        TimeoutError,
+        json.JSONDecodeError,
+    ):
+        return error_response(
+            502,
+            "upstream_unavailable",
+            "knowledge-base index unavailable",
+        )
+
+    return {
+        "query": q,
+        "hits": payload["hits"],
+    }
+
