@@ -3,3 +3,6 @@
 # <file>:<rule id>:<line>, as the gate's log prints it). The ignore-policy job enforces CI-SPEC.md P-06: directly above
 # every entry, '#' lines of your own giving the reason, at least 20 characters in total. Leave the blank line below.
 
+# Lab 3 k8s evidence: Helm's pod annotation checksum/secret is a SHA-256 digest of the rendered Grafana Secret,
+# not the secret itself; it lets the chart restart pods on change and grants no access to anything.
+k8s/evidence.json:generic-api-key:5314
