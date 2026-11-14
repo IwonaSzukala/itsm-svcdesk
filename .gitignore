@@ -7,3 +7,5 @@ __pycache__/
 # local data: use a named volume in docker-compose.yml, never a bind mount
 data/
 *.db
+# mutmut's working copies (Lab 5 Stretch 1)
+mutation/mutants/

@@ -1,0 +1,28 @@
+# ai-generated: 80% - Claude Code wrote these two rules from two decisions of my svcdesk (one ticket writer, one clock reader); I chose the decisions and the ok cases
+rules:
+  - id: svcdesk-tickets-table-write
+    languages: [python]
+    severity: INFO
+    message: >-
+      A write to the tickets table. svcdesk has one writer, save_ticket(), which stores the whole ticket document
+      at once; a second writer could store half a state change. This guard lists every writer: expect exactly one.
+    patterns:
+      - pattern: $CONN.execute("$SQL", ...)
+      - metavariable-regex:
+          metavariable: $SQL
+          regex: (?i)^["']?\s*(INSERT|UPDATE|DELETE|REPLACE)\b[\s\S]*\btickets\b
+
+  - id: svcdesk-wall-clock-read
+    languages: [python]
+    severity: INFO
+    message: >-
+      A direct read of the wall clock. Ticket instants come from now_for_request(request), the one place that honours
+      SVCDESK_TEST_CLOCK (Lab 1); a second reader would stamp tickets the test clock cannot control. This guard lists
+      every reader: expect only the fallback inside now_for_request. Durations use time.perf_counter(), which is fine.
+    pattern-either:
+      - pattern: datetime.now(...)
+      - pattern: datetime.utcnow(...)
+      - pattern: datetime.datetime.now(...)
+      - pattern: datetime.datetime.utcnow(...)
+      - pattern: date.today()
+      - pattern: time.time()
