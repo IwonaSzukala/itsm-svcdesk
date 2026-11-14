@@ -11,4 +11,8 @@ RUN pip install --no-cache-dir -r requirements.txt && pip uninstall -y pip
 
 COPY src ./src
 
+# run as an unprivileged user; /data (the SQLite volume) is created owned by it so a fresh volume inherits that owner
+RUN useradd --system --uid 10001 --no-create-home svcdesk && mkdir -p /data && chown svcdesk /data
+USER svcdesk
+
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
